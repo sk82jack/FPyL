@@ -38,6 +38,20 @@ def CreatePlayerList():
     PlayerList = json.loads(response.read(),)
     return PlayerList
 
+#Creates JSON object containing team names with ID numbers for matching data
+def GetTeams():
+    response = urllib.urlopen('https://fantasy.premierleague.com/drf/teams/')
+    Teams = json.loads(response.read(),)
+    MyTeams = []
+
+    for i in range(len(Teams)):
+        TeamEdit = {}
+        TeamEdit['Name'] = Teams[i].get('name')
+        TeamEdit['ID'] = Teams[i].get('id')
+        MyTeams.append(TeamEdit)
+    return MyTeams
+
+
 #creates CSV file containing all data from the current gameweek
 def GetGameweekData():    
     gw = GetCurrentGameweek() 
