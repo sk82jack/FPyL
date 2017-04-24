@@ -31,7 +31,13 @@ def FPLlogin():
                       'redirect_uri': 'https://fantasy.premierleague.com/a/login'}
             session.post('https://users.premierleague.com/accounts/login/',data = values)
     return session
-    
+   
+#creates JSON object of all player details with total scores,teams,positions etc.
+def CreatePlayerList():
+    response = urllib.urlopen("https://fantasy.premierleague.com/drf/elements/")
+    PlayerList = json.loads(response.read(),)
+    return PlayerList
+
 #creates CSV file containing all data from the current gameweek
 def GetGameweekData():    
     gw = GetCurrentGameweek() 
@@ -64,5 +70,5 @@ def GetGameweekData():
         csvwriter.writerow(players.values())
 
     ThisWeek.close()
+
     
-GetGameweekData()
