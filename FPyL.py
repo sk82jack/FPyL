@@ -7,8 +7,8 @@ GAMEWEEKS_SUMMARY_SUBURL = "events/"
 PLAYERS_GAMEWEEK_SUBURL = "elements/"
 TEAMS_GAMEWEEK_SUBURL = "teams/"
 USER_SUMMARY_SUBURL = "element-summary/"
-LEAGUE_CLASSIC_STANDING_SUBURL = "leagues-classic-standings/"
-LEAGUE_H2H_STANDING_SUBURL = "leagues-h2h-standings/"
+LEAGUE_CLASSIC_SUBURL = "leagues-classic-standings/"
+LEAGUE_H2H_SUBURL = "leagues-h2h-standings/"
 TEAM_ENTRY_SUBURL = "entry/"
 
 GAMEWEEKS_SUMMARY_URL = FPL_URL + GAMEWEEKS_SUMMARY_SUBURL
@@ -88,3 +88,50 @@ def get_gameweek_data(path):
             count += 1
         csvwriter.writerow(players.values())
     this_week.close()
+
+def get_league_managers(league_id, league_type):
+    """Get FPL managers in specified league
+
+    Example: https://fantasy.premierleague.com/drf/leagues-classic-standings/336217?phase=1&le-page=1&ls-page=5
+    """
+    ls_page = 0
+    managers = []
+    if league_type == 'classic':
+        league_type_suburl = LEAGUE_CLASSIC_SUBURL
+    elif league_type == 'h2h':
+        league_type_suburl = LEAGUE_H2H_SUBURL
+    else:
+        print("Please choose 'classic' or 'h2h' for league_type")
+        return
+    while True:
+        ls_page += 1
+        league_url = FPL_URL + league_type_suburl + str(league_id) + "?phase=1&le-page=1&ls-page=" + str(ls_page)
+        response = requests.get(league_url).json()
+        standings = response["standings"]
+        for player in standings["results"]:
+            team = {}
+            team['Team'] = player['entry_name']
+            team['Name'] = player['player_name']
+            team['ID'] = player['entry']
+            managers.append(team)
+        if standings["has_next"] is False:
+            break
+    return managers
+
+def get_manager_team(manager_id, gameweek_number):
+    """Team picked by user.
+
+    Example: https://fantasy.premierleague.com/drf/entry/2677936/event/1/picks
+    """
+    event_sub_url = "event/" + str(gameweek_number) + "/picks"
+    team_gameweek_url = FPL_URL + TEAM_ENTRY_SUBURL + str(manager_id) + "/" + event_sub_url
+
+    response = requests.get(team_gameweek_url).json()
+    players = response["picks"]
+    elements = []
+    for player in players:
+        elements.append(player["element"])
+        if player["is_captain"]:
+            captain_id = player["element"]
+
+    return elements, captain_id
