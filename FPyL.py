@@ -2,10 +2,23 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import csv
 import requests
 
+FPL_URL = "https://fantasy.premierleague.com/drf/"
+GAMEWEEKS_SUMMARY_SUBURL = "events/"
+PLAYERS_GAMEWEEK_SUBURL = "elements/"
+TEAMS_GAMEWEEK_SUBURL = "teams/"
+USER_SUMMARY_SUBURL = "element-summary/"
+LEAGUE_CLASSIC_STANDING_SUBURL = "leagues-classic-standings/"
+LEAGUE_H2H_STANDING_SUBURL = "leagues-h2h-standings/"
+TEAM_ENTRY_SUBURL = "entry/"
+
+GAMEWEEKS_SUMMARY_URL = FPL_URL + GAMEWEEKS_SUMMARY_SUBURL
+PLAYERS_GAMEWEEK_URL = FPL_URL + PLAYERS_GAMEWEEK_SUBURL
+TEAMS_GAMEWEEK_URL = FPL_URL + TEAMS_GAMEWEEK_SUBURL
+USER_SUMMARY_URL = FPL_URL + USER_SUMMARY_SUBURL
+
 def get_current_gameweek():
     """Displays the current gameweek number"""
-    url = "https://fantasy.premierleague.com/drf/events/"
-    response = requests.get(url)
+    response = requests.get(GAMEWEEKS_SUMMARY_URL)
     json = response.json()
     for gameweek in reversed(range(len(json))):
         while json[gameweek]["is_current"]:
@@ -13,8 +26,7 @@ def get_current_gameweek():
 
 def get_player_count():
     """Displays the total number of Fantasy Premier League players"""
-    url = "https://fantasy.premierleague.com/drf/elements/"
-    response = requests.get(url)
+    response = requests.get(PLAYERS_GAMEWEEK_URL)
     json = response.json()
     return int(len(json))
 
@@ -38,8 +50,7 @@ def create_player_list():
 
 def get_teams():
     """Creates JSON object containing team names with ID numbers for matching data"""
-    url = "https://fantasy.premierleague.com/drf/teams/"
-    response = requests.get(url)
+    response = requests.get(PLAYERS_GAMEWEEK_URL)
     json = response.json()
     my_teams = []
 
@@ -57,7 +68,7 @@ def get_gameweek_data():
     urls = []
     futures = []
     for i in range(get_player_count()):
-        urls.append("https://fantasy.premierleague.com/drf/element-summary/" + str(i + 1))
+        urls.append(USER_SUMMARY_URL + str(i + 1))
     pool = ThreadPoolExecutor(len(urls))
     for url in urls:
         futures.append(pool.submit(urllib.urlopen, url))
