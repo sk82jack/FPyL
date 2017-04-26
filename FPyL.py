@@ -19,9 +19,9 @@ USER_SUMMARY_URL = FPL_URL + USER_SUMMARY_SUBURL
 def get_current_gameweek():
     """Displays the current gameweek number"""
     response = requests.get(GAMEWEEKS_SUMMARY_URL).json()
-    for gameweek in reversed(range(len(response))):
-        while response[gameweek]["is_current"]:
-            return int(response[gameweek]["id"])
+    for gameweek in response:
+        if gameweek['is_current']:
+            return int(gameweek['id'])
 
 def get_player_count():
     """Displays the total number of Fantasy Premier League players"""
