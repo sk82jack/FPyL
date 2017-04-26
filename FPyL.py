@@ -1,4 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import concurrent.futures
 import csv
 import requests
 
@@ -64,10 +64,10 @@ def get_gameweek_data(path):
     futures = []
     for i in range(get_player_count()):
         urls.append(USER_SUMMARY_URL + str(i + 1))
-    pool = ThreadPoolExecutor(len(urls))
+    pool = concurrent.futures.ThreadPoolExecutor(len(urls))
     for url in urls:
         futures.append(pool.submit(requests.get, url))
-    for response in as_completed(futures):
+    for response in concurrent.futures.as_completed(futures):
         player = response.result().json()
         if player['history'][0]['round'] > gameweek:
             break
