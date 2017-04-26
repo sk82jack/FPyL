@@ -29,9 +29,18 @@ def get_player_count():
     return int(len(response))
 
 def fpl_login(username, password):
-    """Creates a requests session which logs you into the FPL website."""
+    """Creates a requests session which logs you into the FPL website.
+
+    Example:
+        fpl_session = fpl_login('username', 'password')
+        html_transfers = fpl_session.get('https://fantasy.premierleague.com/a/squad/transfers')
+        print(html_transfers.content)
+    """
     with requests.Session() as fpl_session:
-        values = {'csrfmiddlewaretoken': '##your token here##',
+        url_home = 'https://users.premierleague.com/accounts/login/'
+        fpl_session.get(url_home) # sets cookie
+        csrftoken = fpl_session.cookies['csrftoken']
+        values = {'csrfmiddlewaretoken': csrftoken,
                   'login': username,
                   'password': password,
                   'app': 'plfpl-web',
