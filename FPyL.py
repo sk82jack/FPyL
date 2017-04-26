@@ -56,7 +56,7 @@ def get_teams():
         teams.append(team)
     return teams
 
-def get_gameweek_data():
+def get_gameweek_data(path):
     """Creates CSV file containing all data from the current gameweek"""
     gameweek = get_current_gameweek()
     my_week = []
@@ -66,10 +66,9 @@ def get_gameweek_data():
         urls.append(USER_SUMMARY_URL + str(i + 1))
     pool = ThreadPoolExecutor(len(urls))
     for url in urls:
-        futures.append(pool.submit(urllib.urlopen, url))
-    results = [r.result() for r in as_completed(futures)]
-    for r in results:
-        player = json.loads(r.read())
+        futures.append(pool.submit(requests.get, url))
+    for response in as_completed(futures):
+        player = response.result().json()
         if player['history'][0]['round'] > gameweek:
             break
 
@@ -77,17 +76,15 @@ def get_gameweek_data():
             if weeks['round'] == gameweek:
                 my_week.append(weeks)
 
-    Filename = '##your filepath##\Week' + str(gameweek) + '.csv'
+    filename = path + 'Week' + str(gameweek) + '.csv'
 
-    ThisWeek = open(Filename, 'w')
-    csvwriter = csv.writer(ThisWeek, lineterminator = '\n')
+    this_week = open(filename, 'w')
+    csvwriter = csv.writer(this_week, lineterminator='\n')
     count = 0
     for players in my_week:
-
         if count == 0:
             header = players.keys()
             csvwriter.writerow(header)
             count += 1
         csvwriter.writerow(players.values())
-
-    ThisWeek.close()
+    this_week.close()
