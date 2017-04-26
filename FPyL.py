@@ -18,17 +18,15 @@ USER_SUMMARY_URL = FPL_URL + USER_SUMMARY_SUBURL
 
 def get_current_gameweek():
     """Displays the current gameweek number"""
-    response = requests.get(GAMEWEEKS_SUMMARY_URL)
-    json = response.json()
-    for gameweek in reversed(range(len(json))):
-        while json[gameweek]["is_current"]:
-            return int(json[gameweek]["id"])
+    response = requests.get(GAMEWEEKS_SUMMARY_URL).json()
+    for gameweek in reversed(range(len(response))):
+        while response[gameweek]["is_current"]:
+            return int(response[gameweek]["id"])
 
 def get_player_count():
     """Displays the total number of Fantasy Premier League players"""
-    response = requests.get(PLAYERS_GAMEWEEK_URL)
-    json = response.json()
-    return int(len(json))
+    response = requests.get(PLAYERS_GAMEWEEK_URL).json()
+    return int(len(response))
 
 def fpl_login(username, password):
     """Creates a requests session which logs you into the FPL website."""
@@ -43,23 +41,20 @@ def fpl_login(username, password):
 
 def create_player_list():
     """creates JSON object of all player details with total scores,teams,positions etc."""
-    url = "https://fantasy.premierleague.com/drf/elements/"
-    response = requests.get(url)
-    json = response.json()
-    return json
+    response = requests.get(PLAYERS_GAMEWEEK_URL).json()
+    return response
 
 def get_teams():
     """Creates JSON object containing team names with ID numbers for matching data"""
-    response = requests.get(PLAYERS_GAMEWEEK_URL)
-    json = response.json()
-    my_teams = []
+    response = requests.get(TEAMS_GAMEWEEK_URL).json()
+    teams = []
 
-    for i in range(len(json)):
+    for key in response:
         team = {}
-        team['Name'] = json[i].get('name')
-        team['ID'] = json[i].get('id')
-        my_teams.append(team)
-    return my_teams
+        team['Name'] = key['name']
+        team['ID'] = key['id']
+        teams.append(team)
+    return teams
 
 def get_gameweek_data():
     """Creates CSV file containing all data from the current gameweek"""
