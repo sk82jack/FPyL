@@ -28,24 +28,25 @@ def get_player_count():
     response = requests.get(PLAYERS_GAMEWEEK_URL).json()
     return int(len(response))
 
-def fpl_login(username, password):
+def fpl_login(email_address, password):
     """Creates a requests session which logs you into the FPL website.
 
     Example:
-        fpl_session = fpl_login('username', 'password')
-        html_transfers = fpl_session.get('https://fantasy.premierleague.com/a/squad/transfers')
-        print(html_transfers.content)
+        fpl_session = fpl_login('eail_address', 'password')
+        requests = fpl_session.get('https://fantasy.premierleague.com/drf/transfers')
     """
-    with requests.Session() as fpl_session:
-        url_home = 'https://users.premierleague.com/accounts/login/'
-        fpl_session.get(url_home) # sets cookie
-        csrftoken = fpl_session.cookies['csrftoken']
-        values = {'csrfmiddlewaretoken': csrftoken,
-                  'login': username,
-                  'password': password,
-                  'app': 'plfpl-web',
-                  'redirect_uri': 'https://fantasy.premierleague.com/a/login'}
-        fpl_session.post('https://users.premierleague.com/accounts/login/', data=values)
+    fpl_session = requests.Session()
+    url_home = 'https://users.premierleague.com/accounts/login/'
+    fpl_session.get(url_home) # sets cookie
+    csrftoken = fpl_session.cookies['csrftoken']
+    values = {
+        'csrfmiddlewaretoken': csrftoken,
+        'login': email_address,
+        'password': password,
+        'app': 'plfpl-web',
+        'redirect_uri': 'https://fantasy.premierleague.com/a/login'
+    }
+    fpl_session.post('https://users.premierleague.com/accounts/login/', data=values)
     return fpl_session
 
 def create_player_list():
