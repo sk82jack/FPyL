@@ -33,7 +33,7 @@ def fpl_login(email_address, password):
 
     Example:
         fpl_session = fpl_login('eail_address', 'password')
-        requests = fpl_session.get('https://fantasy.premierleague.com/drf/transfers')
+        requests = fpl_session.get('https://fantasy.premierleague.com/drf/transfers').json()
     """
     fpl_session = requests.Session()
     url_home = 'https://users.premierleague.com/accounts/login/'
