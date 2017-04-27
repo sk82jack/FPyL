@@ -34,7 +34,7 @@ def fpl_login(email_address, password):
         'app': 'plfpl-web',
         'redirect_uri': 'https://fantasy.premierleague.com/a/login'
     }
-    fpl_session.post('https://users.premierleague.com/accounts/login/', data=values)
+    fpl_session.post(url_home, data=values)
     return fpl_session
 
 def get_current_gameweek():
