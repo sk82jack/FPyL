@@ -2,7 +2,28 @@ import concurrent.futures
 import csv
 import requests
 
+### Relative links:
+###
+### /bootstrap ---------------------------- (more data if authenticated)
+### /bootstrap-static ---------------------
+### /bootstrap-dynamic --------------------
+### /events -------------------------------
+### /elements -----------------------------
+### /element-types ------------------------
+### /fixtures -----------------------------
+### /teams --------------------------------
+### /region -------------------------------
+### /entry/{entryId} ----------------------
+### /transfers ---------------------------- (requires auth)
+### /my-team/{teamId} --------------------- (requires auth)
+### /leagues-entered/{teamId} ------------- (requires auth)
+### /leagues-classic-standings/{leagueId} -
+### /leagues-h2h-standings/{leagueId} -----
+### /leagues-classic/{leagueId} ----------- (must be a member)
+### /leagues-h2h/{leagueId} --------------- (must be a member)
+
 FPL_URL = "https://fantasy.premierleague.com/drf/"
+
 GAMEWEEKS_SUMMARY_SUBURL = "events/"
 PLAYERS_GAMEWEEK_SUBURL = "elements/"
 TEAMS_GAMEWEEK_SUBURL = "teams/"
