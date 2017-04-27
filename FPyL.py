@@ -16,23 +16,11 @@ PLAYERS_GAMEWEEK_URL = FPL_URL + PLAYERS_GAMEWEEK_SUBURL
 TEAMS_GAMEWEEK_URL = FPL_URL + TEAMS_GAMEWEEK_SUBURL
 USER_SUMMARY_URL = FPL_URL + USER_SUMMARY_SUBURL
 
-def get_current_gameweek():
-    """Displays the current gameweek number"""
-    response = requests.get(GAMEWEEKS_SUMMARY_URL).json()
-    for gameweek in response:
-        if gameweek['is_current']:
-            return int(gameweek['id'])
-
-def get_player_count():
-    """Displays the total number of Fantasy Premier League players"""
-    response = requests.get(PLAYERS_GAMEWEEK_URL).json()
-    return int(len(response))
-
 def fpl_login(email_address, password):
     """Creates a requests session which logs you into the FPL website.
 
     Example:
-        fpl_session = fpl_login('eail_address', 'password')
+        fpl_session = fpl_login('email_address', 'password')
         requests = fpl_session.get('https://fantasy.premierleague.com/drf/transfers').json()
     """
     fpl_session = requests.Session()
@@ -48,6 +36,18 @@ def fpl_login(email_address, password):
     }
     fpl_session.post('https://users.premierleague.com/accounts/login/', data=values)
     return fpl_session
+
+def get_current_gameweek():
+    """Displays the current gameweek number"""
+    response = requests.get(GAMEWEEKS_SUMMARY_URL).json()
+    for gameweek in response:
+        if gameweek['is_current']:
+            return int(gameweek['id'])
+
+def get_player_count():
+    """Displays the total number of Fantasy Premier League players"""
+    response = requests.get(PLAYERS_GAMEWEEK_URL).json()
+    return int(len(response))
 
 def create_player_list():
     """creates JSON object of all player details with total scores,teams,positions etc."""
