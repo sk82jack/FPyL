@@ -63,41 +63,28 @@ def get_current_gameweek():
     response = requests.get(GAMEWEEKS_SUMMARY_URL).json()
     for gameweek in response:
         if gameweek['is_current']:
-            return int(gameweek['id'])
+            return gameweek['id']
 
 def get_player_count():
     """Displays the total number of Fantasy Premier League players"""
-    response = requests.get(PLAYERS_GAMEWEEK_URL).json()
-    return int(len(response))
+    return len(requests.get(PLAYERS_GAMEWEEK_URL).json())
 
 def create_player_list():
     """creates JSON object of all player details with total scores,teams,positions etc."""
-    response = requests.get(PLAYERS_GAMEWEEK_URL).json()
-    return response
+    return requests.get(PLAYERS_GAMEWEEK_URL).json()
 
 def get_teams():
     """Creates JSON object containing team names with ID numbers for matching data"""
     response = requests.get(TEAMS_GAMEWEEK_URL).json()
-    teams = []
-
-    for key in response:
-        team = {}
-        team['Name'] = key['name']
-        team['ID'] = key['id']
-        teams.append(team)
-    return teams
+    return [{'name': key['name'], 'id': key['id']} for key in response]
 
 def get_gameweek_data(path):
     """Creates CSV file containing all data from the current gameweek"""
     gameweek = get_current_gameweek()
     my_week = []
-    urls = []
-    futures = []
-    for i in range(get_player_count()):
-        urls.append(USER_SUMMARY_URL + str(i + 1))
+    urls = [USER_SUMMARY_URL + str(i + 1) for i in range(get_player_count())]
     pool = concurrent.futures.ThreadPoolExecutor(len(urls))
-    for url in urls:
-        futures.append(pool.submit(requests.get, url))
+    futures = [pool.submit(requests.get, url) for url in urls]
     for response in concurrent.futures.as_completed(futures):
         player = response.result().json()
         if player['history'][0]['round'] > gameweek:
@@ -140,10 +127,10 @@ def get_league_managers(league_id, league_type):
         response = requests.get(league_url).json()
         standings = response["standings"]
         for player in standings["results"]:
-            team = {}
-            team['Team'] = player['entry_name']
-            team['Name'] = player['player_name']
-            team['ID'] = player['entry']
+            team = {'team': player['entry_name'],
+                    'name': player['player_name'],
+                    'id': player['entry']
+                   }
             managers.append(team)
         if standings["has_next"] is False:
             break
