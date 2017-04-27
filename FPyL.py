@@ -38,11 +38,11 @@ TEAMS_GAMEWEEK_URL = FPL_URL + TEAMS_GAMEWEEK_SUBURL
 USER_SUMMARY_URL = FPL_URL + USER_SUMMARY_SUBURL
 
 def fpl_login(email_address, password):
-    """Creates a requests session which logs you into the FPL website.
+    """ Creates a requests session which logs you into the FPL website.
 
-    Example:
-        fpl_session = fpl_login('email_address', 'password')
-        requests = fpl_session.get('https://fantasy.premierleague.com/drf/transfers').json()
+        Example:
+            fpl_session = fpl_login('email_address', 'password')
+            requests = fpl_session.get('https://fantasy.premierleague.com/drf/transfers').json()
     """
     fpl_session = requests.Session()
     url_home = 'https://users.premierleague.com/accounts/login/'
@@ -59,24 +59,28 @@ def fpl_login(email_address, password):
     return fpl_session
 
 def get_current_gameweek():
-    """Displays the current gameweek number"""
+    """ Displays the current gameweek number
+    """
     response = requests.get(GAMEWEEKS_SUMMARY_URL).json()
     for gameweek in response:
         if gameweek['is_current']:
             return int(gameweek['id'])
 
 def get_player_count():
-    """Displays the total number of Fantasy Premier League players"""
+    """ Displays the total number of Fantasy Premier League players
+    """
     response = requests.get(PLAYERS_GAMEWEEK_URL).json()
     return int(len(response))
 
 def create_player_list():
-    """creates JSON object of all player details with total scores,teams,positions etc."""
+    """ creates JSON object of all player details with total scores,teams,positions etc.
+    """
     response = requests.get(PLAYERS_GAMEWEEK_URL).json()
     return response
 
 def get_teams():
-    """Creates JSON object containing team names with ID numbers for matching data"""
+    """ Creates JSON object containing team names with ID numbers for matching data
+    """
     response = requests.get(TEAMS_GAMEWEEK_URL).json()
     teams = []
 
@@ -88,7 +92,8 @@ def get_teams():
     return teams
 
 def get_gameweek_data(path):
-    """Creates CSV file containing all data from the current gameweek"""
+    """ Creates CSV file containing all data from the current gameweek
+    """
     gameweek = get_current_gameweek()
     my_week = []
     urls = []
@@ -121,9 +126,9 @@ def get_gameweek_data(path):
     this_week.close()
 
 def get_league_managers(league_id, league_type):
-    """Get FPL managers in specified league
+    """ Get FPL managers in specified league
 
-    Example: https://fantasy.premierleague.com/drf/leagues-classic-standings/336217?phase=1&le-page=1&ls-page=5
+        Example: https://fantasy.premierleague.com/drf/leagues-classic-standings/336217?phase=1&le-page=1&ls-page=5
     """
     ls_page = 0
     managers = []
@@ -150,9 +155,9 @@ def get_league_managers(league_id, league_type):
     return managers
 
 def get_manager_team(manager_id, gameweek_number):
-    """Team picked by user.
+    """ Team picked by user.
 
-    Example: https://fantasy.premierleague.com/drf/entry/2677936/event/1/picks
+        Example: https://fantasy.premierleague.com/drf/entry/2677936/event/1/picks
     """
     event_sub_url = "event/" + str(gameweek_number) + "/picks"
     team_gameweek_url = FPL_URL + TEAM_ENTRY_SUBURL + str(manager_id) + "/" + event_sub_url
