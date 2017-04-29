@@ -69,7 +69,7 @@ def get_json_response(url):
         def excepthook(type, value, traceback):
             print(value)
         sys.excepthook = excepthook
-        raise ValueError("The game is currently being updated. Please try again later.")
+        raise ValueError('The game is currently being updated. Please try again later.')
 
 def get_current_gameweek():
     """ Displays the current gameweek number
@@ -96,7 +96,6 @@ def get_teams():
     """
     response = get_json_response(TEAMS_GAMEWEEK_URL)
     teams = []
-
     for key in response:
         team = {}
         team['Name'] = key['name']
@@ -120,7 +119,6 @@ def get_gameweek_data(path):
         player = response.result()
         if player['history'][0]['round'] > gameweek:
             break
-
         for weeks in player['history']:
             if weeks['round'] == gameweek:
                 my_week.append(weeks)
@@ -150,11 +148,11 @@ def get_league_managers(league_id, league_type):
     elif league_type == 'h2h':
         league_type_suburl = LEAGUE_H2H_SUBURL
     else:
-        print("Please choose 'classic' or 'h2h' for league_type")
+        print('Please choose \'classic\' or \'h2h\' for league_type')
         return
     while True:
         ls_page += 1
-        league_url = FPL_URL + league_type_suburl + str(league_id) + "?phase=1&le-page=1&ls-page=" + str(ls_page)
+        league_url = FPL_URL + league_type_suburl + str(league_id) + '?phase=1&le-page=1&ls-page=' + str(ls_page)
         response = get_json_response(league_url)
         standings = response["standings"]
         for player in standings["results"]:
@@ -172,15 +170,14 @@ def get_manager_team(manager_id, gameweek_number):
 
         Example: https://fantasy.premierleague.com/drf/entry/2677936/event/1/picks
     """
-    event_sub_url = "event/" + str(gameweek_number) + "/picks"
-    team_gameweek_url = FPL_URL + TEAM_ENTRY_SUBURL + str(manager_id) + "/" + event_sub_url
+    event_sub_url = 'event/' + str(gameweek_number) + '/picks'
+    team_gameweek_url = FPL_URL + TEAM_ENTRY_SUBURL + str(manager_id) + '/' + event_sub_url
 
     response = get_json_response(team_gameweek_url).json()
-    players = response["picks"]
+    players = response['picks']
     elements = []
     for player in players:
-        elements.append(player["element"])
-        if player["is_captain"]:
-            captain_id = player["element"]
-
+        elements.append(player['element'])
+        if player['is_captain']:
+            captain_id = player['element']
     return elements, captain_id
