@@ -22,15 +22,15 @@ import requests
 ### /leagues-classic/{leagueId} ----------- (must be a member)
 ### /leagues-h2h/{leagueId} --------------- (must be a member)
 
-FPL_URL = "https://fantasy.premierleague.com/drf/"
+FPL_URL = 'https://fantasy.premierleague.com/drf/'
 
-GAMEWEEKS_SUMMARY_SUBURL = "events/"
-PLAYERS_GAMEWEEK_SUBURL = "elements/"
-TEAMS_GAMEWEEK_SUBURL = "teams/"
-USER_SUMMARY_SUBURL = "element-summary/"
-LEAGUE_CLASSIC_SUBURL = "leagues-classic-standings/"
-LEAGUE_H2H_SUBURL = "leagues-h2h-standings/"
-TEAM_ENTRY_SUBURL = "entry/"
+GAMEWEEKS_SUMMARY_SUBURL = 'events/'
+PLAYERS_GAMEWEEK_SUBURL = 'elements/'
+TEAMS_GAMEWEEK_SUBURL = 'teams/'
+USER_SUMMARY_SUBURL = 'element-summary/'
+LEAGUE_CLASSIC_SUBURL = 'leagues-classic-standings/'
+LEAGUE_H2H_SUBURL = 'leagues-h2h-standings/'
+TEAM_ENTRY_SUBURL = 'entry/'
 
 GAMEWEEKS_SUMMARY_URL = FPL_URL + GAMEWEEKS_SUMMARY_SUBURL
 PLAYERS_GAMEWEEK_URL = FPL_URL + PLAYERS_GAMEWEEK_SUBURL
@@ -154,14 +154,14 @@ def get_league_managers(league_id, league_type):
         ls_page += 1
         league_url = FPL_URL + league_type_suburl + str(league_id) + '?phase=1&le-page=1&ls-page=' + str(ls_page)
         response = get_json_response(league_url)
-        standings = response["standings"]
+        standings = response['standings']
         for player in standings["results"]:
             team = {}
             team['Team'] = player['entry_name']
             team['Name'] = player['player_name']
             team['ID'] = player['entry']
             managers.append(team)
-        if standings["has_next"] is False:
+        if standings['has_next'] is False:
             break
     return managers
 
