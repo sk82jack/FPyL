@@ -32,10 +32,10 @@ LEAGUE_CLASSIC_SUBURL = 'leagues-classic-standings/'
 LEAGUE_H2H_SUBURL = 'leagues-h2h-standings/'
 TEAM_ENTRY_SUBURL = 'entry/'
 
-GAMEWEEKS_SUMMARY_URL = FPL_URL + GAMEWEEKS_SUMMARY_SUBURL
-PLAYERS_GAMEWEEK_URL = FPL_URL + PLAYERS_GAMEWEEK_SUBURL
-TEAMS_GAMEWEEK_URL = FPL_URL + TEAMS_GAMEWEEK_SUBURL
-USER_SUMMARY_URL = FPL_URL + USER_SUMMARY_SUBURL
+GAMEWEEKS_SUMMARY_URL = ''.join([FPL_URL, GAMEWEEKS_SUMMARY_SUBURL])
+PLAYERS_GAMEWEEK_URL = ''.join([FPL_URL, PLAYERS_GAMEWEEK_SUBURL])
+TEAMS_GAMEWEEK_URL = ''.join([FPL_URL, TEAMS_GAMEWEEK_SUBURL])
+USER_SUMMARY_URL = ''.join([FPL_URL, USER_SUMMARY_SUBURL])
 
 def fpl_login(email_address, password):
     """ Creates a requests session which logs you into the FPL website.
@@ -111,7 +111,7 @@ def get_gameweek_data(path):
     urls = []
     futures = []
     for i in range(get_player_count()):
-        urls.append(USER_SUMMARY_URL + str(i + 1))
+        urls.append(''.join([USER_SUMMARY_URL, str(i + 1)]))
     pool = concurrent.futures.ThreadPoolExecutor(len(urls))
     for url in urls:
         futures.append(pool.submit(get_json_response, url))
@@ -123,7 +123,7 @@ def get_gameweek_data(path):
             if weeks['round'] == gameweek:
                 my_week.append(weeks)
 
-    filename = path + 'Week' + str(gameweek) + '.csv'
+    filename = ''.join([path, 'Week', str(gameweek), '.csv'])
 
     this_week = open(filename, 'w')
     csvwriter = csv.writer(this_week, lineterminator='\n')
@@ -152,7 +152,11 @@ def get_league_managers(league_id, league_type):
         return
     while True:
         ls_page += 1
-        league_url = FPL_URL + league_type_suburl + str(league_id) + '?phase=1&le-page=1&ls-page=' + str(ls_page)
+        league_url = ''.join([FPL_URL,
+                              league_type_suburl,
+                              str(league_id),
+                              '?phase=1&le-page=1&ls-page=',
+                              str(ls_page)])
         response = get_json_response(league_url)
         standings = response['standings']
         for player in standings["results"]:
@@ -170,10 +174,13 @@ def get_manager_team(manager_id, gameweek_number):
 
         Example: https://fantasy.premierleague.com/drf/entry/2677936/event/1/picks
     """
-    event_sub_url = 'event/' + str(gameweek_number) + '/picks'
-    team_gameweek_url = FPL_URL + TEAM_ENTRY_SUBURL + str(manager_id) + '/' + event_sub_url
-
-    response = get_json_response(team_gameweek_url).json()
+    event_sub_url = ''.join(['event/', str(gameweek_number), '/picks'])
+    team_gameweek_url = ''.join([FPL_URL,
+                                 TEAM_ENTRY_SUBURL,
+                                 str(manager_id),
+                                 '/',
+                                 event_sub_url])
+    response = get_json_response(team_gameweek_url)
     players = response['picks']
     elements = []
     for player in players:
