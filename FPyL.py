@@ -174,12 +174,12 @@ def get_manager_team(manager_id, gameweek_number):
 
         Example: https://fantasy.premierleague.com/drf/entry/2677936/event/1/picks
     """
-    event_sub_url = ''.join(['event/', str(gameweek_number), '/picks'])
     team_gameweek_url = ''.join([FPL_URL,
                                  TEAM_ENTRY_SUBURL,
                                  str(manager_id),
-                                 '/',
-                                 event_sub_url])
+                                 '/event/',
+                                 str(gameweek_number),
+                                 '/picks'])
     response = get_json_response(team_gameweek_url)
     players = response['picks']
     elements = []
