@@ -58,10 +58,23 @@ def fpl_login(email_address, password):
     fpl_session.post(url_home, data=values)
     return fpl_session
 
+def get_json_response(url):
+    """ Get's the JSON response from a specified URL with error checking.
+    """
+    response = requests.get(url)
+    try:
+        return response.json()
+    except ValueError:
+        import sys
+        def excepthook(type, value, traceback):
+            print(value)
+        sys.excepthook = excepthook
+        raise ValueError("The game is currently being updated. Please try again later.")
+
 def get_current_gameweek():
     """ Displays the current gameweek number
     """
-    response = requests.get(GAMEWEEKS_SUMMARY_URL).json()
+    response = get_json_response(GAMEWEEKS_SUMMARY_URL)
     for gameweek in response:
         if gameweek['is_current']:
             return int(gameweek['id'])
@@ -69,19 +82,19 @@ def get_current_gameweek():
 def get_player_count():
     """ Displays the total number of Fantasy Premier League players
     """
-    response = requests.get(PLAYERS_GAMEWEEK_URL).json()
+    response = get_json_response(PLAYERS_GAMEWEEK_URL)
     return int(len(response))
 
 def create_player_list():
     """ creates JSON object of all player details with total scores,teams,positions etc.
     """
-    response = requests.get(PLAYERS_GAMEWEEK_URL).json()
+    response = get_json_response(PLAYERS_GAMEWEEK_URL)
     return response
 
 def get_teams():
     """ Creates JSON object containing team names with ID numbers for matching data
     """
-    response = requests.get(TEAMS_GAMEWEEK_URL).json()
+    response = get_json_response(TEAMS_GAMEWEEK_URL)
     teams = []
 
     for key in response:
@@ -102,9 +115,9 @@ def get_gameweek_data(path):
         urls.append(USER_SUMMARY_URL + str(i + 1))
     pool = concurrent.futures.ThreadPoolExecutor(len(urls))
     for url in urls:
-        futures.append(pool.submit(requests.get, url))
+        futures.append(pool.submit(get_json_response, url))
     for response in concurrent.futures.as_completed(futures):
-        player = response.result().json()
+        player = response.result()
         if player['history'][0]['round'] > gameweek:
             break
 
@@ -142,7 +155,7 @@ def get_league_managers(league_id, league_type):
     while True:
         ls_page += 1
         league_url = FPL_URL + league_type_suburl + str(league_id) + "?phase=1&le-page=1&ls-page=" + str(ls_page)
-        response = requests.get(league_url).json()
+        response = get_json_response(league_url)
         standings = response["standings"]
         for player in standings["results"]:
             team = {}
@@ -162,7 +175,7 @@ def get_manager_team(manager_id, gameweek_number):
     event_sub_url = "event/" + str(gameweek_number) + "/picks"
     team_gameweek_url = FPL_URL + TEAM_ENTRY_SUBURL + str(manager_id) + "/" + event_sub_url
 
-    response = requests.get(team_gameweek_url).json()
+    response = get_json_response(team_gameweek_url).json()
     players = response["picks"]
     elements = []
     for player in players:
