@@ -46,7 +46,7 @@ def fpl_login(email_address, password):
     fpl_session.post(url_home, data=values)
     return fpl_session
 
-def get_json_response(url):
+def json_response(url):
     """ Get's the JSON response from a specified URL with error checking.
     """
     with requests.session() as session:
@@ -59,35 +59,35 @@ def get_json_response(url):
             sys.excepthook = excepthook
             raise ValueError('The game is currently being updated. Please try again later.')
 
-def get_current_gameweek():
+def current_gameweek():
     """ Displays the current gameweek number
     """
-    response = get_json_response(FPL_URL+'events/')
+    response = json_response(FPL_URL+'events/')
     for gameweek in response:
         if gameweek['is_current']:
             return gameweek['id']
 
-def get_player_list():
+def player_list():
     """ creates JSON object of all player details with total scores,teams,positions etc.
     """
-    response = get_json_response(FPL_URL+'elements/')
+    response = json_response(FPL_URL+'elements/')
     return response
 
-def get_teams():
+def teams():
     """ Creates JSON object containing team names with ID numbers for matching data
     """
-    response = get_json_response(TEAMS_GAMEWEEK_URL)
-    teams = [{'name': key['name'], 'id': key['id']} for key in response]
-    return teams
+    response = json_response(TEAMS_GAMEWEEK_URL)
+    teams_info = [{'name': key['name'], 'id': key['id']} for key in response]
+    return teams_info
 
-def get_gameweek_data(path):
+def gameweek_data(path):
     """ Creates CSV file containing all data from the current gameweek
     """
-    gameweek = get_current_gameweek()
+    gameweek = current_gameweek()
     my_week = []
-    urls = [FPL_URL+'element-summary/'+str(i + 1) for i in range(len(get_player_list()))]
+    urls = [FPL_URL+'element-summary/'+str(i + 1) for i in range(len(player_list()))]
     pool = concurrent.futures.ThreadPoolExecutor(len(urls))
-    futures = [pool.submit(get_json_response, url) for url in urls]
+    futures = [pool.submit(json_response, url) for url in urls]
     for response in concurrent.futures.as_completed(futures):
         player = response.result()
         if player['history'][0]['round'] > gameweek:
@@ -109,7 +109,7 @@ def get_gameweek_data(path):
         csvwriter.writerow(players.values())
     this_week.close()
 
-def get_league_managers(league_id, league_type):
+def league_managers(league_id, league_type):
     """ Get FPL managers in specified league
 
         Example: https://fantasy.premierleague.com/drf/leagues-classic-standings/336217?phase=1&le-page=1&ls-page=5
@@ -126,7 +126,7 @@ def get_league_managers(league_id, league_type):
     while True:
         ls_page += 1
         league_url = FPL_URL+suburl+str(league_id)+'?phase=1&le-page=1&ls-page='+str(ls_page)
-        response = get_json_response(league_url)
+        response = json_response(league_url)
         managers = [{
             'team': player['entry_name'],
             'Name': player['player_name'],
@@ -136,13 +136,13 @@ def get_league_managers(league_id, league_type):
             break
     return managers
 
-def get_manager_team(manager_id, gameweek_number):
+def manager_team(manager_id, gameweek_number):
     """ Team picked by user.
 
         Example: https://fantasy.premierleague.com/drf/entry/2677936/event/1/picks
     """
     team_gameweek_url = FPL_URL+'entry/'+str(manager_id)+'/event/'+str(gameweek_number)+'/picks'
-    response = get_json_response(team_gameweek_url)
+    response = json_response(team_gameweek_url)
     elements = []
     for player in response['picks']:
         elements.append(player['element'])
