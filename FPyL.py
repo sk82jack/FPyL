@@ -9,6 +9,7 @@ import requests
 ### /bootstrap-dynamic --------------------
 ### /events -------------------------------
 ### /elements -----------------------------
+### /element-summary ----------------------
 ### /element-types ------------------------
 ### /fixtures -----------------------------
 ### /teams --------------------------------
@@ -95,12 +96,7 @@ def get_teams():
     """ Creates JSON object containing team names with ID numbers for matching data
     """
     response = get_json_response(TEAMS_GAMEWEEK_URL)
-    teams = []
-    for key in response:
-        team = {}
-        team['Name'] = key['name']
-        team['ID'] = key['id']
-        teams.append(team)
+    teams = [{'name': key['name'], 'id': key['id']} for key in response]
     return teams
 
 def get_gameweek_data(path):
@@ -108,13 +104,9 @@ def get_gameweek_data(path):
     """
     gameweek = get_current_gameweek()
     my_week = []
-    urls = []
-    futures = []
-    for i in range(get_player_count()):
-        urls.append(''.join([USER_SUMMARY_URL, str(i + 1)]))
+    urls = [''.join([USER_SUMMARY_URL, str(i + 1)]) for i in range(get_player_count())]
     pool = concurrent.futures.ThreadPoolExecutor(len(urls))
-    for url in urls:
-        futures.append(pool.submit(get_json_response, url))
+    futures = [pool.submit(get_json_response, url) for url in urls]
     for response in concurrent.futures.as_completed(futures):
         player = response.result()
         if player['history'][0]['round'] > gameweek:
@@ -158,14 +150,11 @@ def get_league_managers(league_id, league_type):
                               '?phase=1&le-page=1&ls-page=',
                               str(ls_page)])
         response = get_json_response(league_url)
-        standings = response['standings']
-        for player in standings["results"]:
-            team = {}
-            team['Team'] = player['entry_name']
-            team['Name'] = player['player_name']
-            team['ID'] = player['entry']
-            managers.append(team)
-        if standings['has_next'] is False:
+        for player in response['standings']["results"]:
+            managers = [{'team': player['entry_name'],
+                         'Name': player['player_name'],
+                         'ID': player['entry']}]
+        if response['standings']['has_next'] is False:
             break
     return managers
 
@@ -181,9 +170,8 @@ def get_manager_team(manager_id, gameweek_number):
                                  str(gameweek_number),
                                  '/picks'])
     response = get_json_response(team_gameweek_url)
-    players = response['picks']
     elements = []
-    for player in players:
+    for player in response['picks']:
         elements.append(player['element'])
         if player['is_captain']:
             captain_id = player['element']
