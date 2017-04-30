@@ -59,13 +59,13 @@ def json_response(url):
             sys.excepthook = excepthook
             raise ValueError('The game is currently being updated. Please try again later.')
 
-def export_csv(json_data, name="CSV"):
+def export_csv(json_data, name='CSV'):
     """ Creates CSV file from JSON response
     """
     filename = '.\\CSV\\' + name + '.csv'
 
-    this_week = open(filename, 'w')
-    csvwriter = csv.writer(this_week, lineterminator='\n')
+    csv_file = open(filename, 'w', encoding='utf-8')
+    csvwriter = csv.writer(csv_file, lineterminator='\n')
     count = 0
     for row in json_data:
         if count == 0:
@@ -73,7 +73,7 @@ def export_csv(json_data, name="CSV"):
             csvwriter.writerow(header)
             count += 1
         csvwriter.writerow(row.values())
-    this_week.close()
+    csv_file.close()
 
 def current_gameweek():
     """ Displays the current gameweek number
