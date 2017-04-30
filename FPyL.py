@@ -62,15 +62,15 @@ def fpl_login(email_address, password):
 def get_json_response(url):
     """ Get's the JSON response from a specified URL with error checking.
     """
-    response = requests.get(url)
-    try:
-        return response.json()
-    except ValueError:
-        import sys
-        def excepthook(type, value, traceback):
-            print(value)
-        sys.excepthook = excepthook
-        raise ValueError('The game is currently being updated. Please try again later.')
+    with requests.session() as session:
+        try:
+            return session.get(url).json()
+        except ValueError:
+            import sys
+            def excepthook(type, value, traceback):
+                print(value)
+            sys.excepthook = excepthook
+            raise ValueError('The game is currently being updated. Please try again later.')
 
 def get_current_gameweek():
     """ Displays the current gameweek number
@@ -84,7 +84,7 @@ def get_player_count():
     """ Displays the total number of Fantasy Premier League players
     """
     response = get_json_response(PLAYERS_GAMEWEEK_URL)
-    return int(len(response))
+    return len(response)
 
 def create_player_list():
     """ creates JSON object of all player details with total scores,teams,positions etc.
