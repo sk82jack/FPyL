@@ -150,10 +150,11 @@ def get_league_managers(league_id, league_type):
                               '?phase=1&le-page=1&ls-page=',
                               str(ls_page)])
         response = get_json_response(league_url)
-        for player in response['standings']["results"]:
-            managers = [{'team': player['entry_name'],
-                         'Name': player['player_name'],
-                         'ID': player['entry']}]
+        managers = [{
+            'team': player['entry_name'],
+            'Name': player['player_name'],
+            'ID': player['entry']
+            } for player in response['standings']["results"]]
         if response['standings']['has_next'] is False:
             break
     return managers
