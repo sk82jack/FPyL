@@ -4,39 +4,26 @@ import requests
 
 ### Relative links:
 ###
-### /bootstrap ---------------------------- (more data if authenticated)
-### /bootstrap-static ---------------------
-### /bootstrap-dynamic --------------------
-### /events -------------------------------
-### /elements -----------------------------
-### /element-summary ----------------------
-### /element-types ------------------------
-### /fixtures -----------------------------
-### /teams --------------------------------
-### /region -------------------------------
-### /entry/{entryId} ----------------------
-### /transfers ---------------------------- (requires auth)
-### /my-team/{teamId} --------------------- (requires auth)
-### /leagues-entered/{teamId} ------------- (requires auth)
-### /leagues-classic-standings/{leagueId} -
-### /leagues-h2h-standings/{leagueId} -----
-### /leagues-classic/{leagueId} ----------- (must be a member)
-### /leagues-h2h/{leagueId} --------------- (must be a member)
+### bootstrap ---------------------------- (more data if authenticated)
+### bootstrap-static ---------------------
+### bootstrap-dynamic --------------------
+### events -------------------------------
+### elements -----------------------------
+### element-summary ----------------------
+### element-types ------------------------
+### fixtures -----------------------------
+### teams --------------------------------
+### region -------------------------------
+### entry/{entryId} ----------------------
+### transfers ---------------------------- (requires auth)
+### my-team/{teamId} --------------------- (requires auth)
+### leagues-entered/{teamId} ------------- (requires auth)
+### leagues-classic-standings/{leagueId} -
+### leagues-h2h-standings/{leagueId} -----
+### leagues-classic/{leagueId} ----------- (must be a member)
+### leagues-h2h/{leagueId} --------------- (must be a member)
 
 FPL_URL = 'https://fantasy.premierleague.com/drf/'
-
-GAMEWEEKS_SUMMARY_SUBURL = 'events/'
-PLAYERS_GAMEWEEK_SUBURL = 'elements/'
-TEAMS_GAMEWEEK_SUBURL = 'teams/'
-USER_SUMMARY_SUBURL = 'element-summary/'
-LEAGUE_CLASSIC_SUBURL = 'leagues-classic-standings/'
-LEAGUE_H2H_SUBURL = 'leagues-h2h-standings/'
-TEAM_ENTRY_SUBURL = 'entry/'
-
-GAMEWEEKS_SUMMARY_URL = ''.join([FPL_URL, GAMEWEEKS_SUMMARY_SUBURL])
-PLAYERS_GAMEWEEK_URL = ''.join([FPL_URL, PLAYERS_GAMEWEEK_SUBURL])
-TEAMS_GAMEWEEK_URL = ''.join([FPL_URL, TEAMS_GAMEWEEK_SUBURL])
-USER_SUMMARY_URL = ''.join([FPL_URL, USER_SUMMARY_SUBURL])
 
 def fpl_login(email_address, password):
     """ Creates a requests session which logs you into the FPL website.
@@ -75,21 +62,15 @@ def get_json_response(url):
 def get_current_gameweek():
     """ Displays the current gameweek number
     """
-    response = get_json_response(GAMEWEEKS_SUMMARY_URL)
+    response = get_json_response(FPL_URL+'events/')
     for gameweek in response:
         if gameweek['is_current']:
-            return int(gameweek['id'])
+            return gameweek['id']
 
-def get_player_count():
-    """ Displays the total number of Fantasy Premier League players
-    """
-    response = get_json_response(PLAYERS_GAMEWEEK_URL)
-    return len(response)
-
-def create_player_list():
+def get_player_list():
     """ creates JSON object of all player details with total scores,teams,positions etc.
     """
-    response = get_json_response(PLAYERS_GAMEWEEK_URL)
+    response = get_json_response(FPL_URL+'elements/')
     return response
 
 def get_teams():
@@ -104,7 +85,7 @@ def get_gameweek_data(path):
     """
     gameweek = get_current_gameweek()
     my_week = []
-    urls = [''.join([USER_SUMMARY_URL, str(i + 1)]) for i in range(get_player_count())]
+    urls = [FPL_URL+'element-summary/'+str(i + 1) for i in range(len(get_player_list()))]
     pool = concurrent.futures.ThreadPoolExecutor(len(urls))
     futures = [pool.submit(get_json_response, url) for url in urls]
     for response in concurrent.futures.as_completed(futures):
@@ -136,19 +117,15 @@ def get_league_managers(league_id, league_type):
     ls_page = 0
     managers = []
     if league_type == 'classic':
-        league_type_suburl = LEAGUE_CLASSIC_SUBURL
+        suburl = 'leagues-classic-standings/'
     elif league_type == 'h2h':
-        league_type_suburl = LEAGUE_H2H_SUBURL
+        suburl = 'leagues-h2h-standings/'
     else:
         print('Please choose \'classic\' or \'h2h\' for league_type')
         return
     while True:
         ls_page += 1
-        league_url = ''.join([FPL_URL,
-                              league_type_suburl,
-                              str(league_id),
-                              '?phase=1&le-page=1&ls-page=',
-                              str(ls_page)])
+        league_url = FPL_URL+suburl+str(league_id)+'?phase=1&le-page=1&ls-page='+str(ls_page)
         response = get_json_response(league_url)
         managers = [{
             'team': player['entry_name'],
@@ -164,12 +141,7 @@ def get_manager_team(manager_id, gameweek_number):
 
         Example: https://fantasy.premierleague.com/drf/entry/2677936/event/1/picks
     """
-    team_gameweek_url = ''.join([FPL_URL,
-                                 TEAM_ENTRY_SUBURL,
-                                 str(manager_id),
-                                 '/event/',
-                                 str(gameweek_number),
-                                 '/picks'])
+    team_gameweek_url = FPL_URL+'entry/'+str(manager_id)+'/event/'+str(gameweek_number)+'/picks'
     response = get_json_response(team_gameweek_url)
     elements = []
     for player in response['picks']:
