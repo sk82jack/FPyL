@@ -59,10 +59,26 @@ def json_response(url):
             sys.excepthook = excepthook
             raise ValueError('The game is currently being updated. Please try again later.')
 
+def export_csv(json_data, name="CSV"):
+    """ Creates CSV file from JSON response
+    """
+    filename = '.\\CSV\\' + name + '.csv'
+
+    this_week = open(filename, 'w')
+    csvwriter = csv.writer(this_week, lineterminator='\n')
+    count = 0
+    for row in json_data:
+        if count == 0:
+            header = row.keys()
+            csvwriter.writerow(header)
+            count += 1
+        csvwriter.writerow(row.values())
+    this_week.close()
+
 def current_gameweek():
     """ Displays the current gameweek number
     """
-    response = json_response(FPL_URL+'events/')
+    response = json_response(FPL_URL + 'events/')
     for gameweek in response:
         if gameweek['is_current']:
             return gameweek['id']
@@ -70,44 +86,33 @@ def current_gameweek():
 def player_list():
     """ creates JSON object of all player details with total scores,teams,positions etc.
     """
-    response = json_response(FPL_URL+'elements/')
+    response = json_response(FPL_URL + 'elements/')
     return response
 
 def teams():
     """ Creates JSON object containing team names with ID numbers for matching data
     """
-    response = json_response(TEAMS_GAMEWEEK_URL)
+    response = json_response(FPL_URL + 'teams/')
     teams_info = [{'name': key['name'], 'id': key['id']} for key in response]
     return teams_info
 
-def gameweek_data(path):
-    """ Creates CSV file containing all data from the current gameweek
+def player_data_history():
+    """ Get player data history
     """
-    gameweek = current_gameweek()
-    my_week = []
-    urls = [FPL_URL+'element-summary/'+str(i + 1) for i in range(len(player_list()))]
-    pool = concurrent.futures.ThreadPoolExecutor(len(urls))
-    futures = [pool.submit(json_response, url) for url in urls]
-    for response in concurrent.futures.as_completed(futures):
-        player = response.result()
-        if player['history'][0]['round'] > gameweek:
-            break
-        for weeks in player['history']:
-            if weeks['round'] == gameweek:
-                my_week.append(weeks)
+    players = requests.get(FPL_URL + 'elements/').json()
+    player_data = []
+    urls = []
+    # Generate list of URLs to iterate over
+    for i in range(len(players)):
+        url = FPL_URL + 'element-summary/' + str(i+1)
+        urls.append(url)
 
-    filename = ''.join([path, 'Week', str(gameweek), '.csv'])
-
-    this_week = open(filename, 'w')
-    csvwriter = csv.writer(this_week, lineterminator='\n')
-    count = 0
-    for players in my_week:
-        if count == 0:
-            header = players.keys()
-            csvwriter.writerow(header)
-            count += 1
-        csvwriter.writerow(players.values())
-    this_week.close()
+    # Retrieve the player data
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        future_to_url = [executor.submit(json_response, url) for url in urls]
+        for future in concurrent.futures.as_completed(future_to_url):
+            player_data.append(future.result())
+    return player_data
 
 def league_managers(league_id, league_type):
     """ Get FPL managers in specified league
@@ -125,7 +130,7 @@ def league_managers(league_id, league_type):
         return
     while True:
         ls_page += 1
-        league_url = FPL_URL+suburl+str(league_id)+'?phase=1&le-page=1&ls-page='+str(ls_page)
+        league_url = FPL_URL + suburl + str(league_id) + '?phase=1&le-page=1&ls-page=' + str(ls_page)
         response = json_response(league_url)
         managers = [{
             'team': player['entry_name'],
@@ -141,7 +146,7 @@ def manager_team(manager_id, gameweek_number):
 
         Example: https://fantasy.premierleague.com/drf/entry/2677936/event/1/picks
     """
-    team_gameweek_url = FPL_URL+'entry/'+str(manager_id)+'/event/'+str(gameweek_number)+'/picks'
+    team_gameweek_url = FPL_URL + 'entry/' + str(manager_id) + '/event/' + str(gameweek_number) + '/picks'
     response = json_response(team_gameweek_url)
     elements = []
     for player in response['picks']:
