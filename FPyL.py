@@ -1,7 +1,3 @@
-import concurrent.futures
-import csv
-import requests
-
 ### Relative links:
 ###
 ### bootstrap ---------------------------- (more data if authenticated)
@@ -23,8 +19,6 @@ import requests
 ### leagues-classic/{leagueId} ----------- (must be a member)
 ### leagues-h2h/{leagueId} --------------- (must be a member)
 
-FPL_URL = 'https://fantasy.premierleague.com/drf/'
-
 def fpl_login(email_address, password):
     """ Creates a requests session which logs you into the FPL website.
 
@@ -32,6 +26,8 @@ def fpl_login(email_address, password):
             fpl_session = fpl_login('email_address', 'password')
             requests = fpl_session.get('https://fantasy.premierleague.com/drf/transfers').json()
     """
+    import requests
+
     fpl_session = requests.Session()
     url_home = 'https://users.premierleague.com/accounts/login/'
     fpl_session.get(url_home) # sets cookie
@@ -49,6 +45,8 @@ def fpl_login(email_address, password):
 def json_response(url):
     """ Get's the JSON response from a specified URL with error checking.
     """
+    import requests
+
     with requests.session() as session:
         try:
             return session.get(url).json()
@@ -62,6 +60,8 @@ def json_response(url):
 def export_csv(json_data, name='CSV'):
     """ Creates CSV file from JSON response
     """
+    import csv
+
     filename = '.\\CSV\\' + name + '.csv'
 
     csv_file = open(filename, 'w', encoding='utf-8')
@@ -78,7 +78,7 @@ def export_csv(json_data, name='CSV'):
 def current_gameweek():
     """ Displays the current gameweek number
     """
-    response = json_response(FPL_URL + 'events/')
+    response = json_response('https://fantasy.premierleague.com/drf/events/')
     for gameweek in response:
         if gameweek['is_current']:
             return gameweek['id']
@@ -86,25 +86,27 @@ def current_gameweek():
 def player_list():
     """ creates JSON object of all player details with total scores,teams,positions etc.
     """
-    response = json_response(FPL_URL + 'elements/')
+    response = json_response('https://fantasy.premierleague.com/drf/elements/')
     return response
 
 def teams():
     """ Creates JSON object containing team names with ID numbers for matching data
     """
-    response = json_response(FPL_URL + 'teams/')
+    response = json_response('https://fantasy.premierleague.com/drf/teams/')
     teams_info = [{'name': key['name'], 'id': key['id']} for key in response]
     return teams_info
 
 def player_data_history():
     """ Get player data history
     """
-    players = requests.get(FPL_URL + 'elements/').json()
+    import concurrent.futures
+
+    players = json_response('https://fantasy.premierleague.com/drf/elements/')
     player_data = []
     urls = []
     # Generate list of URLs to iterate over
     for i in range(len(players)):
-        url = FPL_URL + 'element-summary/' + str(i+1)
+        url = 'https://fantasy.premierleague.com/drf/element-summary/' + str(i+1)
         urls.append(url)
 
     # Retrieve the player data
@@ -130,7 +132,7 @@ def league_managers(league_id, league_type):
         return
     while True:
         ls_page += 1
-        league_url = FPL_URL + suburl + str(league_id) + '?phase=1&le-page=1&ls-page=' + str(ls_page)
+        league_url = 'https://fantasy.premierleague.com/drf/' + suburl + str(league_id) + '?phase=1&le-page=1&ls-page=' + str(ls_page)
         response = json_response(league_url)
         managers = [{
             'team': player['entry_name'],
@@ -146,7 +148,7 @@ def manager_team(manager_id, gameweek_number):
 
         Example: https://fantasy.premierleague.com/drf/entry/2677936/event/1/picks
     """
-    team_gameweek_url = FPL_URL + 'entry/' + str(manager_id) + '/event/' + str(gameweek_number) + '/picks'
+    team_gameweek_url = 'https://fantasy.premierleague.com/drf/entry/' + str(manager_id) + '/event/' + str(gameweek_number) + '/picks'
     response = json_response(team_gameweek_url)
     elements = []
     for player in response['picks']:
