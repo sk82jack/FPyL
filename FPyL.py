@@ -102,7 +102,6 @@ def player_data_history():
     import concurrent.futures
 
     players = json_response('https://fantasy.premierleague.com/drf/elements/')
-    player_data = []
     urls = []
     # Generate list of URLs to iterate over
     for i in range(len(players)):
@@ -113,7 +112,7 @@ def player_data_history():
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         future_to_url = [executor.submit(json_response, url) for url in urls]
         for future in concurrent.futures.as_completed(future_to_url):
-            player_data.append(future.result()['history'])
+            player_data = [player for player in future.result()['history']]
     return player_data
 
 def league_managers(league_id, league_type):
