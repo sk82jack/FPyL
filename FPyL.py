@@ -156,3 +156,15 @@ def manager_team(manager_id, gameweek_number):
         if player['is_captain']:
             captain_id = player['element']
     return elements, captain_id
+
+def top_1k():
+    import concurrent.futures
+    suburl = 'https://fantasy.premierleague.com/drf/leagues-classic-standings/313?phase=1&le-page=1&ls-page='
+    urls = []
+    for ls_page in range(1, 20):
+        urls.append(suburl + str(ls_page))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        future_to_url = [executor.submit(json_response, url) for url in urls]
+        for future in concurrent.futures.as_completed(future_to_url):
+            top_1k_teams = [team for team in future.result()['standings']['results']]
+    return top_1k_teams
