@@ -63,17 +63,13 @@ def export_csv(json_data, name='CSV'):
     import csv
 
     filename = '.\\CSV\\' + name + '.csv'
+    headers = json_data[0].keys()
 
-    csv_file = open(filename, 'w', encoding='utf-8')
-    csvwriter = csv.writer(csv_file, lineterminator='\n')
-    count = 0
-    for row in json_data:
-        if count == 0:
-            header = row.keys()
-            csvwriter.writerow(header)
-            count += 1
-        csvwriter.writerow(row.values())
-    csv_file.close()
+    with open(filename, 'w', encoding='utf-8') as csv_file:
+        csvwriter = csv.writer(csv_file, lineterminator='\n')
+        csvwriter.writerow(headers)
+        for row in json_data:
+            csvwriter.writerow(row.values())
 
 def current_gameweek():
     """ Displays the current gameweek number
