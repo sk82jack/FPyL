@@ -101,6 +101,7 @@ def player_data_history():
     import concurrent.futures
 
     players = json_response('https://fantasy.premierleague.com/drf/elements/')
+    player_data = []
     urls = []
     # Generate list of URLs to iterate over
     for i in range(len(players)):
@@ -111,7 +112,8 @@ def player_data_history():
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         future_to_url = [executor.submit(json_response, url) for url in urls]
         for future in concurrent.futures.as_completed(future_to_url):
-            player_data = [player for player in future.result()['history']]
+            for player in future.result()['history']:
+                player_data.append(player)
     return player_data
 
 def league_managers(league_id, league_type):
@@ -132,11 +134,12 @@ def league_managers(league_id, league_type):
         ls_page += 1
         league_url = 'https://fantasy.premierleague.com/drf/' + suburl + str(league_id) + '?phase=1&le-page=1&ls-page=' + str(ls_page)
         response = json_response(league_url)
-        managers = [{
-            'team': player['entry_name'],
-            'Name': player['player_name'],
-            'ID': player['entry']
-            } for player in response['standings']["results"]]
+        for player in response['standings']["results"]:
+            managers.append({
+                'team': player['entry_name'],
+                'Name': player['player_name'],
+                'ID': player['entry']
+                })
         if response['standings']['has_next'] is False:
             break
     return managers
@@ -159,10 +162,12 @@ def top_1k():
     import concurrent.futures
     suburl = 'https://fantasy.premierleague.com/drf/leagues-classic-standings/313?phase=1&le-page=1&ls-page='
     urls = []
-    for ls_page in range(1, 20):
+    top_1k_teams = []
+    for ls_page in range(1, 21):
         urls.append(suburl + str(ls_page))
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         future_to_url = [executor.submit(json_response, url) for url in urls]
         for future in concurrent.futures.as_completed(future_to_url):
-            top_1k_teams = [team for team in future.result()['standings']['results']]
+            for team in future.result()['standings']['results']:
+                top_1k_teams.append(team)
     return top_1k_teams
