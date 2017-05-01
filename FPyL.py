@@ -66,6 +66,7 @@ def export_csv(json_data, name='CSV'):
     headers = json_data[0].keys()
 
     with open(filename, 'w', encoding='utf-16') as csv_file:
+        csvwriter = csv.writer(csv_file, delimiter='\t', lineterminator='\n')
         csvwriter.writerow(headers)
         for row in json_data:
             csvwriter.writerow(row.values())
