@@ -5,9 +5,9 @@ import terminaltables
 
 colorama.init()
 
-parser = argparse.ArgumentParser()
-parser.add_argument('email', help='Enter your FPL email address here')
-parser.add_argument('password', help='Enter your FPL password here')
+parser = argparse.ArgumentParser(description='Get upcoming fixtures for your players')
+parser.add_argument('-e', '--email', help='FPL email address', required = True)
+parser.add_argument('-p', '--password', help='FPL password', required = True)
 args = parser.parse_args()
 
 result = []
