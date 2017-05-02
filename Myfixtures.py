@@ -12,7 +12,7 @@ args = parser.parse_args()
 
 result = []
 fpl_session = FPyL.fpl_login(args.email, args.password)
-team_ids = FPyL.teams_ids()
+team_ids = FPyL.team_ids()
 player_ids, player_team_ids = FPyL.player_ids()
 
 # Get users team info

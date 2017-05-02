@@ -98,7 +98,7 @@ def player_ids():
         players_teamid[player['web_name']] = player['team_code']
     return players_id, players_teamid
 
-def teams_ids():
+def team_ids():
     """ Creates JSON object containing team names with ID numbers for matching data
     """
     response = json_response('https://fantasy.premierleague.com/drf/teams/')
