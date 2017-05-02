@@ -24,7 +24,7 @@ def fpl_login(email_address, password):
 
         Example:
             fpl_session = fpl_login('email_address', 'password')
-            requests = fpl_session.get('https://fantasy.premierleague.com/drf/transfers').json()
+            response = json_response('https://fantasy.premierleague.com/drf/transfers')
     """
     import requests
 
@@ -140,10 +140,8 @@ def player_data_history():
                 player_data.append(player)
     return player_data
 
-def league_managers(league_id, league_type):
-    """ Get FPL managers in specified league
-
-        Example: https://fantasy.premierleague.com/drf/leagues-classic-standings/336217?phase=1&le-page=1&ls-page=5
+def league_table(league_id, league_type):
+    """ Get FPL league table in JSON format given a league ID and a league type.
     """
     ls_page = 0
     managers = []
@@ -159,11 +157,7 @@ def league_managers(league_id, league_type):
         league_url = 'https://fantasy.premierleague.com/drf/' + suburl + str(league_id) + '?phase=1&le-page=1&ls-page=' + str(ls_page)
         response = json_response(league_url)
         for player in response['standings']["results"]:
-            managers.append({
-                'team': player['entry_name'],
-                'Name': player['player_name'],
-                'ID': player['entry']
-                })
+            managers.append(player)
         if response['standings']['has_next'] is False:
             break
     return managers
