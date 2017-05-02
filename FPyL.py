@@ -20,7 +20,7 @@
 ### leagues-h2h/{leagueId} --------------- (must be a member)
 
 def fpl_login(email_address, password):
-    """ Creates a requests session which logs you into the FPL website.
+    """ Creates an authenticated requests session using FPL login credentials supplied.
 
         Example:
             fpl_session = fpl_login('email_address', 'password')
@@ -43,7 +43,7 @@ def fpl_login(email_address, password):
     return fpl_session
 
 def json_response(url, session=''):
-    """ Get's the JSON response from a specified URL with error checking.
+    """ Get's the JSON response from an FPL URL with error checking.
     """
     import requests
     if session == '':
@@ -74,7 +74,7 @@ def export_csv(json_data, name='CSV'):
             csvwriter.writerow(row.values())
 
 def current_gameweek():
-    """ Displays the current gameweek number
+    """ Outputs the current gameweek number as an integer
     """
     response = json_response('https://fantasy.premierleague.com/drf/events/')
     for gameweek in response:
@@ -88,7 +88,14 @@ def player_list():
     return response
 
 def player_ids():
-    """ Creates JSON object containing player names with ID numbers for matching data
+    """ Creates 2 dictionaries; one of all the Premier League players and their player IDs and the other of all the Premier League players and their team IDs.
+        The first dictionary is in the form {1: Hazard, 2: Kane, ...}
+        The second dictionary is in the form {Hazard: 3, Kane: 10, ...}
+
+        Example:
+            players_id, players_team_id = player_ids()
+            player = players_id[1]
+            team_id = players_team_id['Hazard']
     """
     response = json_response('https://fantasy.premierleague.com/drf/elements/')
     players_id = {}
@@ -99,7 +106,12 @@ def player_ids():
     return players_id, players_teamid
 
 def team_ids():
-    """ Creates JSON object containing team names with ID numbers for matching data
+    """ Creates a dictionary of all the premier league teams and their IDs.
+        The dictionary is in the form {1: Arsenal, 2: Bournemouth, ...}
+
+        Example:
+            teams = team_ids()
+            team = teams[1]
     """
     response = json_response('https://fantasy.premierleague.com/drf/teams/')
     teams = {}
