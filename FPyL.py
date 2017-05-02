@@ -42,20 +42,22 @@ def fpl_login(email_address, password):
     fpl_session.post(url_home, data=values)
     return fpl_session
 
-def json_response(url):
+def json_response(url, session=''):
     """ Get's the JSON response from a specified URL with error checking.
     """
     import requests
-
-    with requests.session() as session:
-        try:
-            return session.get(url).json()
-        except ValueError:
-            import sys
-            def excepthook(type, value, traceback):
-                print(value)
-            sys.excepthook = excepthook
-            raise ValueError('The game is currently being updated. Please try again later.')
+    if session == '':
+        fpl_session = requests.session()
+    else:
+        fpl_session = session
+    try:
+        return fpl_session.get(url).json()
+    except ValueError:
+        import sys
+        def excepthook(type, value, traceback):
+            print(value)
+        sys.excepthook = excepthook
+        raise ValueError('The game is currently being updated. Please try again later.')
 
 def export_csv(json_data, name='CSV'):
     """ Creates CSV file from JSON response
