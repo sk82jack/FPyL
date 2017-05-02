@@ -87,6 +87,17 @@ def player_list():
     response = json_response('https://fantasy.premierleague.com/drf/elements/')
     return response
 
+def player_ids():
+    """ Creates JSON object containing player names with ID numbers for matching data
+    """
+    response = json_response('https://fantasy.premierleague.com/drf/elements/')
+    players_id = {}
+    players_teamid = {}
+    for player in response:
+        players_id[player['id']] = player['web_name']
+        players_teamid[player['web_name']] = player['team_code']
+    return players_id, players_teamid
+
 def teams_ids():
     """ Creates JSON object containing team names with ID numbers for matching data
     """
