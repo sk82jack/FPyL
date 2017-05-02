@@ -23,4 +23,5 @@ MyFixtures.py -e FPLemail@email.com -p FPLpassword
 ```
 
 Example output:
+
 ![alt text](http://i.imgur.com/7KZUox5.png "MyFixtures.py output")
