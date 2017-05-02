@@ -29,7 +29,7 @@ def fpl_login(email_address, password):
 
         Example:
             fpl_session = fpl_login('email_address', 'password')
-            response = json_response('https://fantasy.premierleague.com/drf/transfers')
+            my_team = json_response('https://fantasy.premierleague.com/drf/transfers', fpl_session)
     """
     import requests
 
@@ -49,6 +49,13 @@ def fpl_login(email_address, password):
 
 def json_response(url, session=''):
     """ Get's the JSON response from an FPL URL with error checking.
+
+        Example:
+            fpl_session = fpl_login('email_address', 'password')
+            my_team = json_response('https://fantasy.premierleague.com/drf/transfers', fpl_session)
+
+        Example 2:
+            fpl_data = json_response('https://fantasy.premierleague.com/drf/bootstrap-static')
     """
     import requests
     if session == '':
