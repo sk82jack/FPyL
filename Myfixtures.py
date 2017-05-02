@@ -12,6 +12,7 @@ args = parser.parse_args()
 
 result = []
 fpl_session = FPyL.fpl_login(args.email, args.password)
+teams = FPyL.teams_ids()
 
 # Get users team info
 response = FPyL.json_response(url='https://fantasy.premierleague.com/drf/transfers', session=fpl_session)
@@ -22,10 +23,12 @@ for player_id in player_ids:
     for player in FPyL.json_response('https://fantasy.premierleague.com/drf/elements/'):
         if player['id'] == player_id:
             name = player['web_name']
+            team_code = player['team_code']
+    team_name = teams[team_code]
     # Create the player dictionary
     temp_player = {
         'id': player_id,
-        'name': name
+        'name': name + '\n(' + team_name + ')'
     }
     # Get future fixtures info
     fixtures = FPyL.json_response('https://fantasy.premierleague.com/drf/element-summary/' + str(player_id))['fixtures']
