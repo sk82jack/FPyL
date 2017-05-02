@@ -16,9 +16,9 @@ team_ids = FPyL.team_ids()
 player_ids, player_team_ids = FPyL.player_ids()
 
 # Get users team info
-response = FPyL.json_response(url='https://fantasy.premierleague.com/drf/transfers', session=fpl_session)
+my_team = FPyL.json_response(url='https://fantasy.premierleague.com/drf/transfers', session=fpl_session)
 fpl_session.close()
-team_player_ids = [player['element'] for player in response['picks']]
+team_player_ids = [player['element'] for player in my_team['picks']]
 for team_player_id in team_player_ids:
     # Get player and team names from the IDs
     player_name = player_ids[team_player_id]
@@ -45,7 +45,7 @@ for team_player_id in team_player_ids:
     result.append(temp_player)
 headers = ['Player']
 # Get the upcoming gameweek
-gw = response['entry']['current_event'] + 1
+gw = my_team['entry']['current_event'] + 1
 max_gw = gw + 5
 while (gw <= 38) and (gw <= max_gw):
     headers.append('Gameweek ' + str(gw))
