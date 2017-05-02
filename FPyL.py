@@ -1,23 +1,28 @@
-### Relative links:
-###
-### bootstrap ---------------------------- (more data if authenticated)
-### bootstrap-static ---------------------
-### bootstrap-dynamic --------------------
-### events -------------------------------
-### elements -----------------------------
-### element-summary ----------------------
-### element-types ------------------------
-### fixtures -----------------------------
-### teams --------------------------------
-### region -------------------------------
-### entry/{entryId} ----------------------
-### transfers ---------------------------- (requires auth)
-### my-team/{teamId} --------------------- (requires auth)
-### leagues-entered/{teamId} ------------- (requires auth)
-### leagues-classic-standings/{leagueId} -
-### leagues-h2h-standings/{leagueId} -----
-### leagues-classic/{leagueId} ----------- (must be a member)
-### leagues-h2h/{leagueId} --------------- (must be a member)
+""" The FPyL module contains functions to help retrieve data from the Fantasy Premier League website.
+
+    ### Base URL:
+    ### https://fantasy.premierleague.com/drf/
+    ###
+    ### Relative links:
+    ### bootstrap ---------------------------- (more data if authenticated)
+    ### bootstrap-static ---------------------
+    ### bootstrap-dynamic --------------------
+    ### events -------------------------------
+    ### elements -----------------------------
+    ### element-summary ----------------------
+    ### element-types ------------------------
+    ### fixtures -----------------------------
+    ### teams --------------------------------
+    ### region -------------------------------
+    ### entry/{entryId} ----------------------
+    ### transfers ---------------------------- (requires auth)
+    ### my-team/{teamId} --------------------- (requires auth)
+    ### leagues-entered/{teamId} ------------- (requires auth)
+    ### leagues-classic-standings/{leagueId} -
+    ### leagues-h2h-standings/{leagueId} -----
+    ### leagues-classic/{leagueId} ----------- (must be a member)
+    ### leagues-h2h/{leagueId} --------------- (must be a member)
+"""
 
 def fpl_login(email_address, password):
     """ Creates an authenticated requests session using FPL login credentials supplied.
