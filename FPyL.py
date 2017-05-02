@@ -59,12 +59,18 @@ def json_response(url, session=''):
         sys.excepthook = excepthook
         raise ValueError('The game is currently being updated. Please try again later.')
 
-def export_csv(json_data, name='CSV'):
-    """ Creates CSV file from JSON response
+def export_csv(json_data, file_name='CSV.csv'):
+    """ Creates CSV file from JSON response and outputs to the CSV folder. You need to include the exntention in the filename
+
+        Example:
+            export_csv(top_1k(), 'Top 1K League Table.csv')
+
+            This will create a CSV file called 'Top 1K League Table.csv' in the CSV folder.
+            The default name is CSV.csv if not specified.
     """
     import csv
 
-    filename = '.\\CSV\\' + name + '.csv'
+    filename = '.\\CSV\\' + file_name
     headers = json_data[0].keys()
 
     with open(filename, 'w', encoding='utf-16') as csv_file:
@@ -97,16 +103,16 @@ def player_ids():
             player = players_id[1]
             team_id = players_team_id['Hazard']
     """
-    response = json_response('https://fantasy.premierleague.com/drf/elements/')
+    players = player_list()
     players_id = {}
     players_teamid = {}
-    for player in response:
+    for player in players:
         players_id[player['id']] = player['web_name']
         players_teamid[player['web_name']] = player['team_code']
     return players_id, players_teamid
 
 def team_ids():
-    """ Creates a dictionary of all the premier league teams and their IDs.
+    """ Creates a dictionary of all the Premier League teams and their IDs.
         The dictionary is in the form {1: Arsenal, 2: Bournemouth, ...}
 
         Example:
@@ -119,12 +125,12 @@ def team_ids():
         teams[team['code']] = team['name']
     return teams
 
-def player_data_history():
-    """ Get player data history
+def player_gameweek_history():
+    """ Get player gameweek history
     """
     import concurrent.futures
 
-    players = json_response('https://fantasy.premierleague.com/drf/elements/')
+    players = player_list()
     player_data = []
     urls = []
     # Generate list of URLs to iterate over
@@ -164,7 +170,7 @@ def league_table(league_id, league_type):
 
 def manager_team(manager_id, gameweek_number):
     """ Creates two outputs about a team picked in a previous gameweek by a specified manager on a specified gameweek.
-    The first output is a list of player IDs.
+    The first output is a list of player IDs for players in the team.
     The second output is the player ID of the captain for that gameweek.
 
         Example:
