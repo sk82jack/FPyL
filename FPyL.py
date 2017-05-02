@@ -163,9 +163,20 @@ def league_table(league_id, league_type):
     return managers
 
 def manager_team(manager_id, gameweek_number):
-    """ Team picked by user.
+    """ Creates two outputs about a team picked in a previous gameweek by a specified manager on a specified gameweek.
+    The first output is a list of player IDs.
+    The second output is the player ID of the captain for that gameweek.
 
-        Example: https://fantasy.premierleague.com/drf/entry/2677936/event/1/picks
+        Example:
+            players, captain = manager_team('30327','29')
+            player_dict = player_ids()[0]
+            team = []
+            for player in players:
+                if player == captain:
+                    team.append(player_dict[player] + ' (C)')
+                else:
+                    team.append(player_dict[player])
+            print(team)
     """
     team_gameweek_url = 'https://fantasy.premierleague.com/drf/entry/' + str(manager_id) + '/event/' + str(gameweek_number) + '/picks'
     response = json_response(team_gameweek_url)
@@ -177,6 +188,8 @@ def manager_team(manager_id, gameweek_number):
     return elements, captain_id
 
 def top_1k():
+    """ Get FPL league table in JSON format for the top 1000 players.
+    """
     import concurrent.futures
     suburl = 'https://fantasy.premierleague.com/drf/leagues-classic-standings/313?phase=1&le-page=1&ls-page='
     urls = []
