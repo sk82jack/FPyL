@@ -251,13 +251,13 @@ def dead_transfers():
     """ Generates a list of players that have been transfered in that aren't playing this gameweek.
 
         Example output:
-            Xhaka: 4380 transfers out
-            Afobe: 1728 transfers out
-            Britos: 767 transfers out
-            Jonathan Benteke: 517 transfers out
-            Coleman: 262 transfers out
-            Morgan: 231 transfers out
-            Phillips: 198 transfers out
+            Xhaka: 4380 transfers in
+            Afobe: 1728 transfers in
+            Britos: 767 transfers in
+            Jonathan Benteke: 517 transfers in
+            Coleman: 262 transfers in
+            Morgan: 231 transfers in
+            Phillips: 198 transfers in
     """
     transfers = {}
     players = player_list()
@@ -266,4 +266,4 @@ def dead_transfers():
             transfers[player['transfers_in_event']] = player['web_name']
     ordered_transfers = sorted(transfers.items(), reverse=True)
     for count, player in ordered_transfers:
-        print('%s: %d transfers out' % (player, count))
+        print('%s: %d transfers in' % (player, count))
