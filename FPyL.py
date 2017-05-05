@@ -205,15 +205,14 @@ def manager_team(manager_id, gameweek_number):
             captain_id = player['element']
     return elements, captain_id
 
-def top_x(player_count):
+def top_1k():
     """ Get FPL league table in JSON format for the top 1000 players.
     """
     import concurrent.futures
     suburl = 'https://fantasy.premierleague.com/drf/leagues-classic-standings/313?phase=1&le-page=1&ls-page='
     urls = []
     top_1k_teams = []
-    pages = int((player_count/50)+1)
-    for ls_page in range(1, pages):
+    for ls_page in range(1, 21):
         urls.append(suburl + str(ls_page))
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
         future_to_url = [executor.submit(json_response, url) for url in urls]
@@ -221,27 +220,3 @@ def top_x(player_count):
             for team in future.result()['standings']['results']:
                 top_1k_teams.append(team)
     return top_1k_teams
-
-    import concurrent.futures
-    TC = 0
-    BB = 0
-    BB_TC = 0
-    players = top_x(player_count)
-    url = 'https://fantasy.premierleague.com/drf/entry/'
-    urls = [url + str(player['id']) + '/history' for player in players]
-    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
-        futures = [executor.submit(json_response, url) for url in urls]
-        for future in concurrent.futures.as_completed(futures):
-            for chip in future.result()['chips']:
-                both = 0
-                if chip['name'] == '3xc':
-                    TC += 1
-                    both += 1
-                if chip['name'] == 'bboost':
-                    BB += 1
-                    both += 1
-                if both == 2:
-                    BB_TC += 1
-    print('Number of players with triple captain: ' + str(TC))
-    print('Number of players with bench boost: ' + str(BB))
-    print('Number of players with both: ' + str(BB_TC))
