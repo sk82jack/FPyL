@@ -246,3 +246,24 @@ def chip_count(player_count):
     print('Number of players with triple captain: ' + str(TC))
     print('Number of players with bench boost: ' + str(BB))
     print('Number of players with both: ' + str(BB_TC))
+
+def dead_transfers():
+    """ Generates a list of players that have been transfered in that aren't playing this gameweek.
+
+        Example output:
+            Xhaka: 4380 transfers out
+            Afobe: 1728 transfers out
+            Britos: 767 transfers out
+            Jonathan Benteke: 517 transfers out
+            Coleman: 262 transfers out
+            Morgan: 231 transfers out
+            Phillips: 198 transfers out
+    """
+    transfers = {}
+    players = player_list()
+    for player in players:
+        if player['chance_of_playing_next_round'] == 0:
+            transfers[player['transfers_in_event']] = player['web_name']
+    ordered_transfers = sorted(transfers.items(), reverse=True)
+    for count, player in ordered_transfers:
+        print('%s: %d transfers out' % (player, count))
